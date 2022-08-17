@@ -123,38 +123,39 @@ def run(ARGS, data=None, model=None, is_test=False):
     powers = [100]
     
     # Set list of models (and their weighting methods) to be trained
-    dict_models={'bar':['variance'], 'gPoE':['uniform', 'variance'], 'rBCM':['diff_entr', 'variance'], 'BCM':['no_weights'], 'PoE':['no_weights']}
-    
+    # dict_models={'bar':['variance'], 'gPoE':['uniform', 'variance'], 'rBCM':['diff_entr', 'variance'], 'BCM':['no_weights'], 'PoE':['no_weights']}
+    dict_models = {'gPoE': ['diff_entr'], 'PoE': ['no_weights']}
+
     # Gather the data
     data = data or get_regression_data(ARGS.dataset, split=ARGS.split)
     print(data.X_train.shape)
-    
+
 
     # Initialize the model
     model = model or get_regression_model(ARGS.model)(is_test=is_test, seed=ARGS.seed)
     if (ARGS.model == 'gp' and data.N>6000):
         return('too large data for full gp')
-    
+
     # Optimize the model by maximizing sum of log-marginal likelihoods
     print('model fitting')
     model.fit(data.X_train, data.Y_train)
-    
-    
-        
-    
+
+
+
+
     if 'expert' in ARGS.model:
-        
+
         if 'minibatching' in ARGS.model:
             minibatching = True
         else:
             minibatching = False
-        
+
         # Gather the predictions of all experts at all test inputs with an option to minibatch. mu_s, var_s are n_expert x n_test
         print('gathering predictions')
         mu_s, var_s = expert_predictions(data.X_test, model, minibatching = minibatching, gather = True)
-                    
-      
-        
+
+
+
         # Loop over models (Poe,...), weighting methods (Wass,variance,...) and powers  (softmax scaling)
         for model_name in dict_models.keys():
             for weighting in dict_models[model_name]:
@@ -162,14 +163,14 @@ def run(ARGS, data=None, model=None, is_test=False):
                     model.power = power
                     model.model = model_name
                     model.weighting = weighting
-                    
+
                     #Aggregate predictions for a single model (using a specific weighting scheme, e.g gPoE_var with T=100). m,v are n_test x 1
                     print('prediction aggregation')
                     m, v = expert_predictions(data.X_test, model, mu_s = mu_s, var_s = var_s, minibatching = minibatching, gather = False)
-                    
+
                     #Add scores (RMSE/NLPD) of the single model to the database
                     res = update_score_database(m, v, data, ARGS, is_test, power = power, weighting = weighting, model_name = model_name)
-                    
+
                     if weighting in [ 'no_weights','uniform','diff_entr'] :
                         break
     else:
