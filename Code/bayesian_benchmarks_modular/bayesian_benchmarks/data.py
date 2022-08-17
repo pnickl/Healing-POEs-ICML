@@ -23,6 +23,9 @@ import shutil
 import pandas as pd
 import tensorflow as tf
 
+# Hide GPU from visible devices
+tf.config.set_visible_devices([], 'GPU')
+
 from sklearn.decomposition import PCA
 from urllib.request import urlopen
 logging.getLogger().setLevel(logging.INFO)
@@ -58,8 +61,8 @@ def normalize(X):
 
 class Dataset(object):
     def __init__(self, split=0, prop=0.9):
-        if self.needs_download:
-            self.download()
+        # if self.needs_download:
+        #     self.download()
 
         X_raw, Y_raw = self.read_data()
         X, Y = self.preprocess_data(X_raw, Y_raw)
@@ -131,6 +134,26 @@ uci_base_url = 'https://archive.ics.uci.edu/ml/machine-learning-databases/'
 
 
 @add_regression
+class Wam(Dataset):
+    N, D, name = 175000, 12, 'wam'
+    def needs_download(self):
+        return False
+
+    def read_data(self):
+        train_input = np.load(DATA_PATH + '/wam/wam_invdyn_train.npz')['input']
+        train_target = np.load(DATA_PATH + '/wam/wam_invdyn_train.npz')['target']
+        test_input = np.load(DATA_PATH + '/wam/wam_invdyn_test.npz')['input']
+        test_target = np.load(DATA_PATH + '/wam/wam_invdyn_test.npz')['target']
+
+        input_data = np.vstack((train_input, test_input))
+        target_data = np.vstack((train_target, test_target))
+        # input_transform = StandardScaler()
+        # target_transform = StandardScaler()
+        # input_transform = input_transform.fit(input_data)
+        # target_transform = target_transform.fit(target_data)
+        return input_data, target_data
+
+@add_regression
 class Concrete(Dataset):
     N, D, name = 1030, 8, 'concrete'
     url = uci_base_url + 'concrete/compressive/Concrete_Data.xls'
@@ -153,7 +176,7 @@ class Airline(Dataset):
 
         return data[:, :-1], data[:, -1].reshape(-1, 1)    
     
-@add_regression
+# @add_regression
 class Power(Dataset):
     N, D, name = 9568, 4, 'power'
     url = uci_base_url + '00294/CCPP.zip'
@@ -180,13 +203,13 @@ class WilsonDataset(Dataset):
         return data[:, :-1], data[:, -1, None]
 
 
-@add_regression
+#@add_regression
 class Wilson_airfoil(WilsonDataset):
     name, N, D = 'wilson_airfoil', 1503, 5
 
 
 
-@add_regression
+#@add_regression
 class Wilson_parkinsons(WilsonDataset):
     name, N, D = 'wilson_parkinsons', 5875, 20
 
