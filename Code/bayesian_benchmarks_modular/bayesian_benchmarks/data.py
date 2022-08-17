@@ -191,11 +191,11 @@ class Wilson_parkinsons(WilsonDataset):
     name, N, D = 'wilson_parkinsons', 5875, 20
 
 
-@add_regression
+#@add_regression
 class Wilson_kin40k(WilsonDataset):
     name, N, D = 'wilson_kin40k', 40000, 8
 
-@add_regression
+#@add_regression
 class Wilson_protein(WilsonDataset):
     name, N, D = 'wilson_protein', 45730, 9
 
