@@ -12,6 +12,10 @@ from bayesian_benchmarks.database_utils import Database
 from bayesian_benchmarks.models.get_model import get_regression_model
 import math
 from tqdm import tqdm
+
+# Hide GPU from visible devices
+tf.config.set_visible_devices([], 'GPU')
+
 def parse_args():  # pragma: no cover
     parser = argparse.ArgumentParser()
     parser.add_argument("--model", default='linear', nargs='?', type=str)
@@ -103,6 +107,13 @@ def update_score_database(m, v, data, ARGS, is_test, power = None, weighting = N
 
     res['test_rmse'] = np.average(d**2)**0.5
     res['test_rmse_unnormalized'] = np.average(du**2)**0.5
+
+    from sklearn.metrics import mean_squared_error, r2_score
+    res['test_mse'] = mean_squared_error(data.Y_test, m)
+    res['test_mse_unnormalized'] = mean_squared_error(data.Y_test * data.Y_std, m * data.Y_std)
+
+    res['test_rmse_sklearn'] = 1 - r2_score(data.Y_test, m)
+    res['test_rmse_unnormalized_sklearn'] = 1 - r2_score(data.Y_test * data.Y_std, m * data.Y_std)
 
     res.update(ARGS.__dict__)
     
