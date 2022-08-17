@@ -45,7 +45,7 @@ def check_needs_run(table, d):
 
 @pytest.mark.parametrize('model', all_regression_models)
 @pytest.mark.parametrize('dataset', regression_datasets)
-@pytest.mark.parametrize('split', range(10))
+@pytest.mark.parametrize('split', range(5))
 def test_run_all_regression(model, dataset, split):
     d = ConvertToNamespace({'dataset':dataset,
                             'model' :  model,
