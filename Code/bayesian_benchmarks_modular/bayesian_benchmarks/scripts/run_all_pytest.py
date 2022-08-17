@@ -56,12 +56,12 @@ def test_run_all_regression(model, dataset, split):
 
 
 
-@pytest.mark.parametrize('dataset', classification_datasets)
-@pytest.mark.parametrize('model', all_classification_models)
-@pytest.mark.parametrize('split', range(10))
-def test_classification(model, dataset, split):
-    d = {'dataset':dataset,
-         'model' :  model,
-         'split' : split}
-    if check_needs_run('classification', d):
-        run_classification(ConvertToNamespace(d), is_test=False)
+# @pytest.mark.parametrize('dataset', classification_datasets)
+# @pytest.mark.parametrize('model', all_classification_models)
+# @pytest.mark.parametrize('split', range(10))
+# def test_classification(model, dataset, split):
+#     d = {'dataset':dataset,
+#          'model' :  model,
+#          'split' : split}
+#     if check_needs_run('classification', d):
+#         run_classification(ConvertToNamespace(d), is_test=False)
