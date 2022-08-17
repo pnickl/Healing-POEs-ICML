@@ -36,6 +36,8 @@ import array
 
 from bayesian_benchmarks.paths import DATA_PATH, BASE_SEED
 
+import scipy.io as sio
+
 _ALL_REGRESSION_DATATSETS = {}
 _ALL_CLASSIFICATION_DATATSETS = {}
 
@@ -146,11 +148,32 @@ class Wam(Dataset):
         test_target = np.load(DATA_PATH + '/wam/wam_invdyn_test.npz')['target']
 
         input_data = np.vstack((train_input, test_input))
-        target_data = np.vstack((train_target, test_target))
-        # input_transform = StandardScaler()
-        # target_transform = StandardScaler()
-        # input_transform = input_transform.fit(input_data)
-        # target_transform = target_transform.fit(target_data)
+        select_output = 0
+        target_data = np.vstack((np.expand_dims(train_target[:, select_output], axis=1),
+                                 np.expand_dims(test_target[:, select_output], axis=1)))
+        return input_data, target_data
+
+#@add_regression
+class Sarcos(Dataset):
+    N, D, name = 175000, 21, 'sarcos'
+    def needs_download(self):
+        return False
+
+    def read_data(self):
+
+        train_data = sio.loadmat(DATA_PATH + '/sarcos/sarcos_inv_train.mat')['sarcos_inv']
+        train_input = train_data[:, 0:21]
+        train_target = train_data[:, 21:28]
+
+        test_data = sio.loadmat(DATA_PATH + '/sarcos/sarcos_inv_test.mat')['sarcos_inv_test']
+        test_input = test_data[:, 0:21]
+        test_target = test_data[:, 21:28]
+
+        select_output = 0
+        input_data = np.vstack((train_input, test_input))
+        target_data = np.vstack((np.expand_dims(train_target[:, select_output], axis=1),
+                                 np.expand_dims(test_target[:, select_output], axis=1)))
+
         return input_data, target_data
 
 @add_regression
