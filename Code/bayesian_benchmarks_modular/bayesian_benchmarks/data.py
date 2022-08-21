@@ -23,9 +23,6 @@ import shutil
 import pandas as pd
 import tensorflow as tf
 
-# Hide GPU from visible devices
-tf.config.set_visible_devices([], 'GPU')
-
 from sklearn.decomposition import PCA
 from urllib.request import urlopen
 logging.getLogger().setLevel(logging.INFO)
@@ -37,6 +34,10 @@ import array
 from bayesian_benchmarks.paths import DATA_PATH, BASE_SEED
 
 import scipy.io as sio
+from sklearn.preprocessing import StandardScaler
+# Hide GPU from visible devices
+tf.config.set_visible_devices([], 'GPU')
+
 
 _ALL_REGRESSION_DATATSETS = {}
 _ALL_CLASSIFICATION_DATATSETS = {}
@@ -147,15 +148,27 @@ class Wam(Dataset):
         test_input = np.load(DATA_PATH + '/wam/wam_invdyn_test.npz')['input']
         test_target = np.load(DATA_PATH + '/wam/wam_invdyn_test.npz')['target']
 
-        input_data = np.vstack((train_input, test_input))
         select_output = 0
+        input_data = np.vstack((train_input, test_input))
         target_data = np.vstack((np.expand_dims(train_target[:, select_output], axis=1),
                                  np.expand_dims(test_target[:, select_output], axis=1)))
+
+        # data = np.hstack((input_data, target_data))
+        # data_train = np.hstack((train_input, train_target))
+        # data_test = np.hstack((test_input, test_target))
+        #
+        # df = pd.DataFrame(data)
+        # df_train = pd.DataFrame(data_train)
+        # df_test = pd.DataFrame(data_test)
+
+        # input_data = StandardScaler().fit_transform(input_data)
+        # target_data = StandardScaler().fit_transform(target_data)
+
         return input_data, target_data
 
-#@add_regression
+# @add_regression
 class Sarcos(Dataset):
-    N, D, name = 175000, 21, 'sarcos'
+    N, D, name = 48933, 21, 'sarcos'
     def needs_download(self):
         return False
 
@@ -173,6 +186,17 @@ class Sarcos(Dataset):
         input_data = np.vstack((train_input, test_input))
         target_data = np.vstack((np.expand_dims(train_target[:, select_output], axis=1),
                                  np.expand_dims(test_target[:, select_output], axis=1)))
+
+        # input_data = StandardScaler().fit_transform(input_data)
+        # target_data = StandardScaler().fit_transform(target_data)
+
+        # data = np.hstack((input_data, target_data))
+        # data_train = np.hstack((train_input, train_target))
+        # data_test = np.hstack((test_input, test_target))
+        #
+        # df = pd.DataFrame(data)
+        # df_train = pd.DataFrame(data_train)
+        # df_test = pd.DataFrame(data_test)
 
         return input_data, target_data
 
