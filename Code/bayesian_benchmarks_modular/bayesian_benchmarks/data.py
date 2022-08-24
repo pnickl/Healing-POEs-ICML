@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 import numpy as np
 import os
 import pandas
@@ -64,8 +63,8 @@ def normalize(X):
 
 class Dataset(object):
     def __init__(self, split=0, prop=0.9):
-        # if self.needs_download:
-        #     self.download()
+        if self.needs_download:
+            self.download()
 
         X_raw, Y_raw = self.read_data()
         X, Y = self.preprocess_data(X_raw, Y_raw)
@@ -132,47 +131,110 @@ class Dataset(object):
         Y, self.Y_mean, self.Y_std = normalize(Y)
         return X, Y
 
+class DatasetRobotics(object):
+    def __init__(self, split=0, prop=0.9):
+        # if self.needs_download:
+        #     self.download()
+
+        X_raw, Y_raw, N_train, N_test = self.read_data()
+        X, Y = self.preprocess_data(X_raw, Y_raw)
+
+        ind = np.arange(N_train + N_test)
+
+        # # Don't randomize, use provided train/test splits
+        # np.random.seed(BASE_SEED + split)
+        # np.random.shuffle(ind)
+
+        self.X_train = X[ind[:N_train]]
+        self.Y_train = Y[ind[:N_train]]
+
+        self.X_test = X[ind[N_train:]]
+        self.Y_test = Y[ind[N_train:]]
+
+    @property
+    def datadir(self):
+        dir = os.path.join(DATA_PATH, self.name)
+        if not os.path.isdir(dir):
+            os.mkdir(dir)
+        return dir
+
+    @property
+    def datapath(self):
+        filename = self.url.split('/')[-1]  # this is for the simple case with no zipped files
+        #print(filename)
+        #print(os.path.join(self.datadir, filename))
+        return os.path.join(self.datadir, filename)
+
+    @property
+    def needs_download(self):
+        return not os.path.isfile(self.datapath)
+
+    def download(self):
+        logging.info('donwloading {} data'.format(self.name))
+
+        is_zipped = np.any([z in self.url for z in ['.gz', '.zip', '.tar']])
+
+        if is_zipped:
+            filename = os.path.join(self.datadir, self.url.split('/')[-1])
+        else:
+            filename = self.datapath
+
+        with urlopen(self.url) as response, open(filename, 'wb') as out_file:
+            data = response.read()
+            out_file.write(data)
+
+        if is_zipped:
+            zip_ref = zipfile.ZipFile(filename, 'r')
+            zip_ref.extractall(self.datadir)
+            zip_ref.close()
+
+            # os.remove(filename)
+
+        logging.info('finished donwloading {} data'.format(self.name))
+
+    def read_data(self):
+        raise NotImplementedError
+
+    def preprocess_data(self, X, Y):
+        X, self.X_mean, self.X_std = normalize(X)
+        Y, self.Y_mean, self.Y_std = normalize(Y)
+        return X, Y
 
 uci_base_url = 'https://archive.ics.uci.edu/ml/machine-learning-databases/'
 
 
 @add_regression
-class Wam(Dataset):
+class Wam(DatasetRobotics):
     N, D, name = 175000, 12, 'wam'
     def needs_download(self):
         return False
 
     def read_data(self):
+        select_output = 0
+
         train_input = np.load(DATA_PATH + '/wam/wam_invdyn_train.npz')['input']
         train_target = np.load(DATA_PATH + '/wam/wam_invdyn_train.npz')['target']
         test_input = np.load(DATA_PATH + '/wam/wam_invdyn_test.npz')['input']
         test_target = np.load(DATA_PATH + '/wam/wam_invdyn_test.npz')['target']
 
-        select_output = 0
+        N_train = len(train_input)
+        N_test = len(test_input)
+
         input_data = np.vstack((train_input, test_input))
         target_data = np.vstack((np.expand_dims(train_target[:, select_output], axis=1),
                                  np.expand_dims(test_target[:, select_output], axis=1)))
 
-        # data = np.hstack((input_data, target_data))
-        # data_train = np.hstack((train_input, train_target))
-        # data_test = np.hstack((test_input, test_target))
-        #
-        # df = pd.DataFrame(data)
-        # df_train = pd.DataFrame(data_train)
-        # df_test = pd.DataFrame(data_test)
+        return input_data, target_data, N_train, N_test
 
-        # input_data = StandardScaler().fit_transform(input_data)
-        # target_data = StandardScaler().fit_transform(target_data)
+@add_regression
+class Sarcos0(DatasetRobotics):
+    N, D, name = 48933, 21, 'sarcos0'
 
-        return input_data, target_data
-
-# @add_regression
-class Sarcos(Dataset):
-    N, D, name = 48933, 21, 'sarcos'
     def needs_download(self):
         return False
 
     def read_data(self):
+        select_output = 0
 
         train_data = sio.loadmat(DATA_PATH + '/sarcos/sarcos_inv_train.mat')['sarcos_inv']
         train_input = train_data[:, 0:21]
@@ -182,25 +244,179 @@ class Sarcos(Dataset):
         test_input = test_data[:, 0:21]
         test_target = test_data[:, 21:28]
 
-        select_output = 0
+        N_train = len(train_input)
+        N_test = len(test_input)
+
         input_data = np.vstack((train_input, test_input))
         target_data = np.vstack((np.expand_dims(train_target[:, select_output], axis=1),
                                  np.expand_dims(test_target[:, select_output], axis=1)))
 
-        # input_data = StandardScaler().fit_transform(input_data)
-        # target_data = StandardScaler().fit_transform(target_data)
+        return input_data, target_data, N_train, N_test
 
-        # data = np.hstack((input_data, target_data))
-        # data_train = np.hstack((train_input, train_target))
-        # data_test = np.hstack((test_input, test_target))
-        #
-        # df = pd.DataFrame(data)
-        # df_train = pd.DataFrame(data_train)
-        # df_test = pd.DataFrame(data_test)
-
-        return input_data, target_data
 
 @add_regression
+class Sarcos1(DatasetRobotics):
+    N, D, name = 48933, 21, 'sarcos1'
+
+    def needs_download(self):
+        return False
+
+    def read_data(self):
+        select_output = 1
+
+        train_data = sio.loadmat(DATA_PATH + '/sarcos/sarcos_inv_train.mat')['sarcos_inv']
+        train_input = train_data[:, 0:21]
+        train_target = train_data[:, 21:28]
+
+        test_data = sio.loadmat(DATA_PATH + '/sarcos/sarcos_inv_test.mat')['sarcos_inv_test']
+        test_input = test_data[:, 0:21]
+        test_target = test_data[:, 21:28]
+
+        N_train = len(train_input)
+        N_test = len(test_input)
+
+        input_data = np.vstack((train_input, test_input))
+        target_data = np.vstack((np.expand_dims(train_target[:, select_output], axis=1),
+                                 np.expand_dims(test_target[:, select_output], axis=1)))
+
+        return input_data, target_data, N_train, N_test
+
+@add_regression
+class Sarcos2(DatasetRobotics):
+    N, D, name = 48933, 21, 'sarcos2'
+
+    def needs_download(self):
+        return False
+
+    def read_data(self):
+        select_output = 2
+
+        train_data = sio.loadmat(DATA_PATH + '/sarcos/sarcos_inv_train.mat')['sarcos_inv']
+        train_input = train_data[:, 0:21]
+        train_target = train_data[:, 21:28]
+
+        test_data = sio.loadmat(DATA_PATH + '/sarcos/sarcos_inv_test.mat')['sarcos_inv_test']
+        test_input = test_data[:, 0:21]
+        test_target = test_data[:, 21:28]
+
+        N_train = len(train_input)
+        N_test = len(test_input)
+
+        input_data = np.vstack((train_input, test_input))
+        target_data = np.vstack((np.expand_dims(train_target[:, select_output], axis=1),
+                                 np.expand_dims(test_target[:, select_output], axis=1)))
+
+        return input_data, target_data, N_train, N_test
+
+@add_regression
+class Sarcos3(DatasetRobotics):
+    N, D, name = 48933, 21, 'sarcos3'
+
+    def needs_download(self):
+        return False
+
+    def read_data(self):
+        select_output = 3
+
+        train_data = sio.loadmat(DATA_PATH + '/sarcos/sarcos_inv_train.mat')['sarcos_inv']
+        train_input = train_data[:, 0:21]
+        train_target = train_data[:, 21:28]
+
+        test_data = sio.loadmat(DATA_PATH + '/sarcos/sarcos_inv_test.mat')['sarcos_inv_test']
+        test_input = test_data[:, 0:21]
+        test_target = test_data[:, 21:28]
+
+        N_train = len(train_input)
+        N_test = len(test_input)
+
+        input_data = np.vstack((train_input, test_input))
+        target_data = np.vstack((np.expand_dims(train_target[:, select_output], axis=1),
+                                 np.expand_dims(test_target[:, select_output], axis=1)))
+
+        return input_data, target_data, N_train, N_test
+
+@add_regression
+class Sarcos4(DatasetRobotics):
+    N, D, name = 48933, 21, 'sarcos4'
+
+    def needs_download(self):
+        return False
+
+    def read_data(self):
+        select_output = 4
+
+        train_data = sio.loadmat(DATA_PATH + '/sarcos/sarcos_inv_train.mat')['sarcos_inv']
+        train_input = train_data[:, 0:21]
+        train_target = train_data[:, 21:28]
+
+        test_data = sio.loadmat(DATA_PATH + '/sarcos/sarcos_inv_test.mat')['sarcos_inv_test']
+        test_input = test_data[:, 0:21]
+        test_target = test_data[:, 21:28]
+
+        N_train = len(train_input)
+        N_test = len(test_input)
+
+        input_data = np.vstack((train_input, test_input))
+        target_data = np.vstack((np.expand_dims(train_target[:, select_output], axis=1),
+                                 np.expand_dims(test_target[:, select_output], axis=1)))
+
+        return input_data, target_data, N_train, N_test
+
+@add_regression
+class Sarcos5(DatasetRobotics):
+    N, D, name = 48933, 21, 'sarcos5'
+
+    def needs_download(self):
+        return False
+
+    def read_data(self):
+        select_output = 5
+
+        train_data = sio.loadmat(DATA_PATH + '/sarcos/sarcos_inv_train.mat')['sarcos_inv']
+        train_input = train_data[:, 0:21]
+        train_target = train_data[:, 21:28]
+
+        test_data = sio.loadmat(DATA_PATH + '/sarcos/sarcos_inv_test.mat')['sarcos_inv_test']
+        test_input = test_data[:, 0:21]
+        test_target = test_data[:, 21:28]
+
+        N_train = len(train_input)
+        N_test = len(test_input)
+
+        input_data = np.vstack((train_input, test_input))
+        target_data = np.vstack((np.expand_dims(train_target[:, select_output], axis=1),
+                                 np.expand_dims(test_target[:, select_output], axis=1)))
+
+        return input_data, target_data, N_train, N_test
+
+@add_regression
+class Sarcos6(DatasetRobotics):
+    N, D, name = 48933, 21, 'sarcos6'
+
+    def needs_download(self):
+        return False
+
+    def read_data(self):
+        select_output = 6
+
+        train_data = sio.loadmat(DATA_PATH + '/sarcos/sarcos_inv_train.mat')['sarcos_inv']
+        train_input = train_data[:, 0:21]
+        train_target = train_data[:, 21:28]
+
+        test_data = sio.loadmat(DATA_PATH + '/sarcos/sarcos_inv_test.mat')['sarcos_inv_test']
+        test_input = test_data[:, 0:21]
+        test_target = test_data[:, 21:28]
+
+        N_train = len(train_input)
+        N_test = len(test_input)
+
+        input_data = np.vstack((train_input, test_input))
+        target_data = np.vstack((np.expand_dims(train_target[:, select_output], axis=1),
+                                 np.expand_dims(test_target[:, select_output], axis=1)))
+
+        return input_data, target_data, N_train, N_test
+
+#@add_regression
 class Concrete(Dataset):
     N, D, name = 1030, 8, 'concrete'
     url = uci_base_url + 'concrete/compressive/Concrete_Data.xls'
@@ -223,7 +439,7 @@ class Airline(Dataset):
 
         return data[:, :-1], data[:, -1].reshape(-1, 1)    
     
-# @add_regression
+#@add_regression
 class Power(Dataset):
     N, D, name = 9568, 4, 'power'
     url = uci_base_url + '00294/CCPP.zip'
