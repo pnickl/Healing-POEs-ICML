@@ -203,9 +203,9 @@ class DatasetRobotics(object):
 uci_base_url = 'https://archive.ics.uci.edu/ml/machine-learning-databases/'
 
 
-#@add_regression
+@add_regression
 class Wam0(DatasetRobotics):
-    N, D, name = 30000, 12, 'wam'
+    N, D, name = 30000, 12, 'wam0'
     def needs_download(self):
         return False
 
@@ -226,9 +226,9 @@ class Wam0(DatasetRobotics):
 
         return input_data, target_data, N_train, N_test
 
-#@add_regression
+@add_regression
 class Wam1(DatasetRobotics):
-    N, D, name = 30000, 12, 'wam'
+    N, D, name = 30000, 12, 'wam1'
     def needs_download(self):
         return False
 
@@ -249,9 +249,9 @@ class Wam1(DatasetRobotics):
 
         return input_data, target_data, N_train, N_test
 
-#@add_regression
+@add_regression
 class Wam2(DatasetRobotics):
-    N, D, name = 30000, 12, 'wam'
+    N, D, name = 30000, 12, 'wam2'
     def needs_download(self):
         return False
 
@@ -272,9 +272,9 @@ class Wam2(DatasetRobotics):
 
         return input_data, target_data, N_train, N_test
 
-#@add_regression
+@add_regression
 class Wam3(DatasetRobotics):
-    N, D, name = 30000, 12, 'wam'
+    N, D, name = 30000, 12, 'wam3'
     def needs_download(self):
         return False
 
@@ -295,7 +295,7 @@ class Wam3(DatasetRobotics):
 
         return input_data, target_data, N_train, N_test
 
-@add_regression
+#@add_regression
 class Sarcos0(DatasetRobotics):
     N, D, name = 48933, 21, 'sarcos0'
 
@@ -323,7 +323,7 @@ class Sarcos0(DatasetRobotics):
         return input_data, target_data, N_train, N_test
 
 
-@add_regression
+#@add_regression
 class Sarcos1(DatasetRobotics):
     N, D, name = 48933, 21, 'sarcos1'
 
@@ -350,7 +350,7 @@ class Sarcos1(DatasetRobotics):
 
         return input_data, target_data, N_train, N_test
 
-@add_regression
+#@add_regression
 class Sarcos2(DatasetRobotics):
     N, D, name = 48933, 21, 'sarcos2'
 
@@ -377,7 +377,7 @@ class Sarcos2(DatasetRobotics):
 
         return input_data, target_data, N_train, N_test
 
-@add_regression
+#@add_regression
 class Sarcos3(DatasetRobotics):
     N, D, name = 48933, 21, 'sarcos3'
 
@@ -404,7 +404,7 @@ class Sarcos3(DatasetRobotics):
 
         return input_data, target_data, N_train, N_test
 
-@add_regression
+#@add_regression
 class Sarcos4(DatasetRobotics):
     N, D, name = 48933, 21, 'sarcos4'
 
@@ -431,7 +431,7 @@ class Sarcos4(DatasetRobotics):
 
         return input_data, target_data, N_train, N_test
 
-@add_regression
+#@add_regression
 class Sarcos5(DatasetRobotics):
     N, D, name = 48933, 21, 'sarcos5'
 
@@ -458,7 +458,7 @@ class Sarcos5(DatasetRobotics):
 
         return input_data, target_data, N_train, N_test
 
-@add_regression
+#@add_regression
 class Sarcos6(DatasetRobotics):
     N, D, name = 48933, 21, 'sarcos6'
 
