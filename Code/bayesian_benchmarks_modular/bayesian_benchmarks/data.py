@@ -203,98 +203,6 @@ class DatasetRobotics(object):
 uci_base_url = 'https://archive.ics.uci.edu/ml/machine-learning-databases/'
 
 
-@add_regression
-class Wam0(DatasetRobotics):
-    N, D, name = 30000, 12, 'wam0'
-    def needs_download(self):
-        return False
-
-    def read_data(self):
-        select_output = 0
-
-        train_input = np.load(DATA_PATH + '/wam/wam_invdyn_train.npz')['input'][0:25000]
-        train_target = np.load(DATA_PATH + '/wam/wam_invdyn_train.npz')['target'][0:25000]
-        test_input = np.load(DATA_PATH + '/wam/wam_invdyn_test.npz')['input'][0:5000]
-        test_target = np.load(DATA_PATH + '/wam/wam_invdyn_test.npz')['target'][0:5000]
-
-        N_train = len(train_input)
-        N_test = len(test_input)
-
-        input_data = np.vstack((train_input, test_input))
-        target_data = np.vstack((np.expand_dims(train_target[:, select_output], axis=1),
-                                 np.expand_dims(test_target[:, select_output], axis=1)))
-
-        return input_data, target_data, N_train, N_test
-
-@add_regression
-class Wam1(DatasetRobotics):
-    N, D, name = 30000, 12, 'wam1'
-    def needs_download(self):
-        return False
-
-    def read_data(self):
-        select_output = 1
-
-        train_input = np.load(DATA_PATH + '/wam/wam_invdyn_train.npz')['input'][0:25000]
-        train_target = np.load(DATA_PATH + '/wam/wam_invdyn_train.npz')['target'][0:25000]
-        test_input = np.load(DATA_PATH + '/wam/wam_invdyn_test.npz')['input'][0:5000]
-        test_target = np.load(DATA_PATH + '/wam/wam_invdyn_test.npz')['target'][0:5000]
-
-        N_train = len(train_input)
-        N_test = len(test_input)
-
-        input_data = np.vstack((train_input, test_input))
-        target_data = np.vstack((np.expand_dims(train_target[:, select_output], axis=1),
-                                 np.expand_dims(test_target[:, select_output], axis=1)))
-
-        return input_data, target_data, N_train, N_test
-
-@add_regression
-class Wam2(DatasetRobotics):
-    N, D, name = 30000, 12, 'wam2'
-    def needs_download(self):
-        return False
-
-    def read_data(self):
-        select_output = 2
-
-        train_input = np.load(DATA_PATH + '/wam/wam_invdyn_train.npz')['input'][0:25000]
-        train_target = np.load(DATA_PATH + '/wam/wam_invdyn_train.npz')['target'][0:25000]
-        test_input = np.load(DATA_PATH + '/wam/wam_invdyn_test.npz')['input'][0:5000]
-        test_target = np.load(DATA_PATH + '/wam/wam_invdyn_test.npz')['target'][0:5000]
-
-        N_train = len(train_input)
-        N_test = len(test_input)
-
-        input_data = np.vstack((train_input, test_input))
-        target_data = np.vstack((np.expand_dims(train_target[:, select_output], axis=1),
-                                 np.expand_dims(test_target[:, select_output], axis=1)))
-
-        return input_data, target_data, N_train, N_test
-
-@add_regression
-class Wam3(DatasetRobotics):
-    N, D, name = 30000, 12, 'wam3'
-    def needs_download(self):
-        return False
-
-    def read_data(self):
-        select_output = 3
-
-        train_input = np.load(DATA_PATH + '/wam/wam_invdyn_train.npz')['input'][0:25000]
-        train_target = np.load(DATA_PATH + '/wam/wam_invdyn_train.npz')['target'][0:25000]
-        test_input = np.load(DATA_PATH + '/wam/wam_invdyn_test.npz')['input'][0:5000]
-        test_target = np.load(DATA_PATH + '/wam/wam_invdyn_test.npz')['target'][0:5000]
-
-        N_train = len(train_input)
-        N_test = len(test_input)
-
-        input_data = np.vstack((train_input, test_input))
-        target_data = np.vstack((np.expand_dims(train_target[:, select_output], axis=1),
-                                 np.expand_dims(test_target[:, select_output], axis=1)))
-
-        return input_data, target_data, N_train, N_test
-
 #@add_regression
 class Sarcos0(DatasetRobotics):
     N, D, name = 48933, 21, 'sarcos0'
@@ -322,6 +230,101 @@ class Sarcos0(DatasetRobotics):
 
         return input_data, target_data, N_train, N_test
 
+@add_regression
+class Wam0(DatasetRobotics):
+    N, D, name = 15000, 12, 'wam0'
+    def needs_download(self):
+        return False
+
+    def read_data(self):
+        select_output = 0
+
+        data = sio.loadmat(DATA_PATH + '/wam_ias/ias_real_barrett_data.mat')
+        train_input = data['X_train']
+        test_input = data['X_test']
+        train_target = data['Y_train']
+        test_target = data['Y_test']
+
+        N_train = len(train_input)
+        N_test = len(test_input)
+
+        input_data = np.vstack((train_input, test_input))
+        target_data = np.vstack((np.expand_dims(train_target[:, select_output], axis=1),
+                                 np.expand_dims(test_target[:, select_output], axis=1)))
+
+        return input_data, target_data, N_train, N_test
+
+@add_regression
+class Wam1(DatasetRobotics):
+    N, D, name = 15000, 12, 'wam1'
+    def needs_download(self):
+        return False
+
+    def read_data(self):
+        select_output = 1
+
+        data = sio.loadmat(DATA_PATH + '/wam_ias/ias_real_barrett_data.mat')
+        train_input = data['X_train']
+        test_input = data['X_test']
+        train_target = data['Y_train']
+        test_target = data['Y_test']
+
+        N_train = len(train_input)
+        N_test = len(test_input)
+
+        input_data = np.vstack((train_input, test_input))
+        target_data = np.vstack((np.expand_dims(train_target[:, select_output], axis=1),
+                                 np.expand_dims(test_target[:, select_output], axis=1)))
+
+        return input_data, target_data, N_train, N_test
+
+@add_regression
+class Wam2(DatasetRobotics):
+    N, D, name = 15000, 12, 'wam2'
+    def needs_download(self):
+        return False
+
+    def read_data(self):
+        select_output = 2
+
+        data = sio.loadmat(DATA_PATH + '/wam_ias/ias_real_barrett_data.mat')
+        train_input = data['X_train']
+        test_input = data['X_test']
+        train_target = data['Y_train']
+        test_target = data['Y_test']
+
+        N_train = len(train_input)
+        N_test = len(test_input)
+
+        input_data = np.vstack((train_input, test_input))
+        target_data = np.vstack((np.expand_dims(train_target[:, select_output], axis=1),
+                                 np.expand_dims(test_target[:, select_output], axis=1)))
+
+        return input_data, target_data, N_train, N_test
+
+@add_regression
+class Wam3(DatasetRobotics):
+    N, D, name = 15000, 12, 'wam3'
+    def needs_download(self):
+        return False
+
+    def read_data(self):
+        select_output = 3
+
+        data = sio.loadmat(DATA_PATH + '/wam_ias/ias_real_barrett_data.mat')
+        train_input = data['X_train']
+        test_input = data['X_test']
+        train_target = data['Y_train']
+        test_target = data['Y_test']
+
+        N_train = len(train_input)
+        N_test = len(test_input)
+
+        input_data = np.vstack((train_input, test_input))
+        target_data = np.vstack((np.expand_dims(train_target[:, select_output], axis=1),
+                                 np.expand_dims(test_target[:, select_output], axis=1)))
+
+        return input_data, target_data, N_train, N_test
 
 #@add_regression
 class Sarcos1(DatasetRobotics):
@@ -484,6 +487,98 @@ class Sarcos6(DatasetRobotics):
                                  np.expand_dims(test_target[:, select_output], axis=1)))
 
         return input_data, target_data, N_train, N_test
+
+# @add_regression
+# class Wam0(DatasetRobotics):
+#     N, D, name = 30000, 12, 'wam0'
+#     def needs_download(self):
+#         return False
+#
+#     def read_data(self):
+#         select_output = 0
+#
+#         train_input = np.load(DATA_PATH + '/wam/wam_invdyn_train.npz')['input'][0:25000]
+#         train_target = np.load(DATA_PATH + '/wam/wam_invdyn_train.npz')['target'][0:25000]
+#         test_input = np.load(DATA_PATH + '/wam/wam_invdyn_test.npz')['input'][0:5000]
+#         test_target = np.load(DATA_PATH + '/wam/wam_invdyn_test.npz')['target'][0:5000]
+#
+#         N_train = len(train_input)
+#         N_test = len(test_input)
+#
+#         input_data = np.vstack((train_input, test_input))
+#         target_data = np.vstack((np.expand_dims(train_target[:, select_output], axis=1),
+#                                  np.expand_dims(test_target[:, select_output], axis=1)))
+#
+#         return input_data, target_data, N_train, N_test
+#
+# @add_regression
+# class Wam1(DatasetRobotics):
+#     N, D, name = 30000, 12, 'wam1'
+#     def needs_download(self):
+#         return False
+#
+#     def read_data(self):
+#         select_output = 1
+#
+#         train_input = np.load(DATA_PATH + '/wam/wam_invdyn_train.npz')['input'][0:25000]
+#         train_target = np.load(DATA_PATH + '/wam/wam_invdyn_train.npz')['target'][0:25000]
+#         test_input = np.load(DATA_PATH + '/wam/wam_invdyn_test.npz')['input'][0:5000]
+#         test_target = np.load(DATA_PATH + '/wam/wam_invdyn_test.npz')['target'][0:5000]
+#
+#         N_train = len(train_input)
+#         N_test = len(test_input)
+#
+#         input_data = np.vstack((train_input, test_input))
+#         target_data = np.vstack((np.expand_dims(train_target[:, select_output], axis=1),
+#                                  np.expand_dims(test_target[:, select_output], axis=1)))
+#
+#         return input_data, target_data, N_train, N_test
+#
+# @add_regression
+# class Wam2(DatasetRobotics):
+#     N, D, name = 30000, 12, 'wam2'
+#     def needs_download(self):
+#         return False
+#
+#     def read_data(self):
+#         select_output = 2
+#
+#         train_input = np.load(DATA_PATH + '/wam/wam_invdyn_train.npz')['input'][0:25000]
+#         train_target = np.load(DATA_PATH + '/wam/wam_invdyn_train.npz')['target'][0:25000]
+#         test_input = np.load(DATA_PATH + '/wam/wam_invdyn_test.npz')['input'][0:5000]
+#         test_target = np.load(DATA_PATH + '/wam/wam_invdyn_test.npz')['target'][0:5000]
+#
+#         N_train = len(train_input)
+#         N_test = len(test_input)
+#
+#         input_data = np.vstack((train_input, test_input))
+#         target_data = np.vstack((np.expand_dims(train_target[:, select_output], axis=1),
+#                                  np.expand_dims(test_target[:, select_output], axis=1)))
+#
+#         return input_data, target_data, N_train, N_test
+#
+# @add_regression
+# class Wam3(DatasetRobotics):
+#     N, D, name = 30000, 12, 'wam3'
+#     def needs_download(self):
+#         return False
+#
+#     def read_data(self):
+#         select_output = 3
+#
+#         train_input = np.load(DATA_PATH + '/wam/wam_invdyn_train.npz')['input'][0:25000]
+#         train_target = np.load(DATA_PATH + '/wam/wam_invdyn_train.npz')['target'][0:25000]
+#         test_input = np.load(DATA_PATH + '/wam/wam_invdyn_test.npz')['input'][0:5000]
+#         test_target = np.load(DATA_PATH + '/wam/wam_invdyn_test.npz')['target'][0:5000]
+#
+#         N_train = len(train_input)
+#         N_test = len(test_input)
+#
+#         input_data = np.vstack((train_input, test_input))
+#         target_data = np.vstack((np.expand_dims(train_target[:, select_output], axis=1),
+#                                  np.expand_dims(test_target[:, select_output], axis=1)))
+#
+#         return input_data, target_data, N_train, N_test
 
 #@add_regression
 class Concrete(Dataset):
