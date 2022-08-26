@@ -409,6 +409,7 @@ class Wam0(DatasetRobotics):
         return False
 
     def read_data(self):
+        name = 'wam0'
         select_output = 0
 
         train_input = np.load(DATA_PATH + '/wam_new/wam_inv_train.npz')['input'][0:25000]
@@ -423,7 +424,7 @@ class Wam0(DatasetRobotics):
         target_data = np.vstack((np.expand_dims(train_target[:, select_output], axis=1),
                                  np.expand_dims(test_target[:, select_output], axis=1)))
 
-        return input_data, target_data, N_train, N_test
+        return input_data, target_data, N_train, N_test, name
 
 @add_regression
 class Wam1(DatasetRobotics):
@@ -432,6 +433,7 @@ class Wam1(DatasetRobotics):
         return False
 
     def read_data(self):
+        name = 'wam1'
         select_output = 1
 
         train_input = np.load(DATA_PATH + '/wam_new/wam_inv_train.npz')['input'][0:25000]
@@ -446,7 +448,7 @@ class Wam1(DatasetRobotics):
         target_data = np.vstack((np.expand_dims(train_target[:, select_output], axis=1),
                                  np.expand_dims(test_target[:, select_output], axis=1)))
 
-        return input_data, target_data, N_train, N_test
+        return input_data, target_data, N_train, N_test, name
 
 @add_regression
 class Wam2(DatasetRobotics):
@@ -455,6 +457,7 @@ class Wam2(DatasetRobotics):
         return False
 
     def read_data(self):
+        name = 'wam2'
         select_output = 2
 
         train_input = np.load(DATA_PATH + '/wam_new/wam_inv_train.npz')['input'][0:25000]
@@ -469,7 +472,7 @@ class Wam2(DatasetRobotics):
         target_data = np.vstack((np.expand_dims(train_target[:, select_output], axis=1),
                                  np.expand_dims(test_target[:, select_output], axis=1)))
 
-        return input_data, target_data, N_train, N_test
+        return input_data, target_data, N_train, N_test, name
 
 @add_regression
 class Wam3(DatasetRobotics):
@@ -478,6 +481,7 @@ class Wam3(DatasetRobotics):
         return False
 
     def read_data(self):
+        name = 'wam3'
         select_output = 3
 
         train_input = np.load(DATA_PATH + '/wam_new/wam_inv_train.npz')['input'][0:25000]
@@ -492,7 +496,7 @@ class Wam3(DatasetRobotics):
         target_data = np.vstack((np.expand_dims(train_target[:, select_output], axis=1),
                                  np.expand_dims(test_target[:, select_output], axis=1)))
 
-        return input_data, target_data, N_train, N_test
+        return input_data, target_data, N_train, N_test, name
 
 # @add_regression
 # class Wam0(DatasetRobotics):
