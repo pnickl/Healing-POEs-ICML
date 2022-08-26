@@ -15,13 +15,15 @@ from tqdm import tqdm
 
 import scipy.io as sio
 from sklearn.metrics import mean_squared_error, r2_score
+import pickle
+
 # Hide GPU from visible devices
 tf.config.set_visible_devices([], 'GPU')
 
 def parse_args():  # pragma: no cover
     parser = argparse.ArgumentParser()
     parser.add_argument("--model", default='expert_100_clustering_minibatching', nargs='?', type=str)
-    parser.add_argument("--dataset", default='wam', nargs='?', type=str)
+    parser.add_argument("--dataset", default='wam0', nargs='?', type=str)
     parser.add_argument("--split", default=0, nargs='?', type=int)
     parser.add_argument("--seed", default=0, nargs='?', type=int)
     parser.add_argument("--database_path", default='', nargs='?', type=str)
@@ -113,7 +115,9 @@ def update_score_database(m, v, data, ARGS, is_test, power = None, weighting = N
     # using sklearn
     unnorm_target = data.Y_test * data.Y_std + data.Y_mean
     unnorm_pred = m * data.Y_std + data.Y_mean
-
+    res['unnorm_target'] = unnorm_target
+    res['unnorm_pred'] = unnorm_pred
+    
     res['test_mse_sklearn'] = mean_squared_error(data.Y_test, m)
     res['test_mse_unnormalized_sklearn'] = mean_squared_error(unnorm_target, unnorm_pred)
 
@@ -124,6 +128,10 @@ def update_score_database(m, v, data, ARGS, is_test, power = None, weighting = N
     
     if 'expert' in ARGS.model:
         res['model']=model_name+'_'+str(power)+'_'+ARGS.model.split('_')[1]+'_'+ARGS.model.split('_')[2]+'_'+weighting
+
+    filename = str(data.name) + '.pkl'
+    with open(filename, 'wb') as f:
+        pickle.dump(res, f)
 
     if not is_test:  # pragma: no cover
         with Database(ARGS.database_path) as db:
